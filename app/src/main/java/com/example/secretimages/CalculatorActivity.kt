@@ -49,14 +49,14 @@ class CalculatorActivity : AppCompatActivity() {
         binding.btnEquals.setOnClickListener { pressEquals() }
     }
 
-    private fun getDisplay() = binding.tvDisplay.text.toString()
+    private fun readDisplay() = binding.tvDisplay.text.toString()
 
     private fun setDisplay(s: String) {
         binding.tvDisplay.text = if (s.isEmpty()) "0" else s
     }
 
     private fun appendDigit(d: String) {
-        val cur = getDisplay()
+        val cur = readDisplay()
         if (startFresh) {
             setDisplay(if (d == "00") "0" else d)
             startFresh = false
@@ -71,7 +71,7 @@ class CalculatorActivity : AppCompatActivity() {
     }
 
     private fun pressOp(op: String) {
-        val cur = getDisplay().toDoubleOrNull()
+        val cur = readDisplay().toDoubleOrNull()
         if (operand1 != null && pendingOp.isNotEmpty() && !startFresh && cur != null) {
             val res = doCalc(operand1!!, pendingOp, cur)
             setDisplay(fmt(res))
@@ -84,7 +84,7 @@ class CalculatorActivity : AppCompatActivity() {
     }
 
     private fun pressPercent() {
-        val v = getDisplay().toDoubleOrNull() ?: return
+        val v = readDisplay().toDoubleOrNull() ?: return
         val res = if (operand1 != null) operand1!! * v / 100.0 else v / 100.0
         setDisplay(fmt(res))
         startFresh = true
@@ -92,13 +92,13 @@ class CalculatorActivity : AppCompatActivity() {
 
     private fun pressBackspace() {
         if (startFresh) return
-        val cur = getDisplay()
+        val cur = readDisplay()
         setDisplay(if (cur.length <= 1) "0" else cur.dropLast(1))
     }
 
     private fun pressAcSet() {
         if (!PasswordManager.isPasswordSet(this)) {
-            val pwd = getDisplay()
+            val pwd = readDisplay()
             if (pwd.length >= 4 && pwd.all { it.isDigit() }) {
                 PasswordManager.setPassword(this, pwd)
                 Toast.makeText(this, "パスワードを設定しました", Toast.LENGTH_SHORT).show()
@@ -113,7 +113,7 @@ class CalculatorActivity : AppCompatActivity() {
     }
 
     private fun pressEquals() {
-        val displayed = getDisplay()
+        val displayed = readDisplay()
         // Unlock check (only when no pending operation)
         if (pendingOp.isEmpty() && PasswordManager.isPasswordSet(this) &&
             PasswordManager.verifyPassword(this, displayed)) {
