@@ -127,10 +127,12 @@ class FolderActivity : AppCompatActivity() {
             99 -> {
                 AlertDialog.Builder(this)
                     .setTitle("フォルダを削除")
-                    .setMessage("フォルダと中の写真を全で�bb�fi8�e��o��fx�b��'ȊB���]��]]�P�]ۊ�bb�fi�H���O���\�\��[]T�X�\��]�[J
-N��[�\�
-
-HB���]�Y�]]�P�]ۊ��x����������ȋ�[
-K����
-B��YB�B�[�HO��\\��ۓ�[ۜ�][T�[X�Y
-][JB�B�B�B
+                    .setMessage("フォルダと中の写真を全て削除しますか？")
+                    .setPositiveButton("削除") { _, _ -> folderDir.deleteRecursively(); finish() }
+                    .setNegativeButton("キャンセル", null).show()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+}
