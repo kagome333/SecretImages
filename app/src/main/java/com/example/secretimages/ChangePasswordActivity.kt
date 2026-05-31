@@ -12,6 +12,7 @@ class ChangePasswordActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityChangePasswordBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
             title = "パスワード変更"
@@ -26,8 +27,8 @@ class ChangePasswordActivity : AppCompatActivity() {
                 Toast.makeText(this, "現在のパスワードが違います", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            if (newPass.length < 4) {
-                Toast.makeText(this, "パスワードは4文字以上にしてください", Toast.LENGTH_SHORT).show()
+            if (newPass.length < 4 || !newPass.all { it.isDigit() }) {
+                Toast.makeText(this, "新しいパスワードは数字4桁以上にしてください", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             if (newPass != confirm) {
@@ -41,7 +42,7 @@ class ChangePasswordActivity : AppCompatActivity() {
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        onBackPressed()
+        onBackPressedDispatcher.onBackPressed()
         return true
     }
 }
