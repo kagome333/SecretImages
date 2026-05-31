@@ -71,7 +71,7 @@ class GalleryAdapter(
 
     inner class PhotoVH(private val b: ItemPhotoBinding) : RecyclerView.ViewHolder(b.root) {
         fun bind(file: File) {
-            b.ivPhoto.setImageBitmap(BitmapFactory.decodeFile(file.absolutePath))
+            b.imageView.setImageBitmap(BitmapFactory.decodeFile(file.absolutePath))
             b.root.setOnClickListener { onPhotoClick(file) }
         }
     }
