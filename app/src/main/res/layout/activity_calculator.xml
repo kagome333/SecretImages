@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F2F2F7"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tvDisplay"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:ellipsize="start"
+        android:gravity="end|bottom"
+        android:maxLines="1"
+        android:paddingBottom="16dp"
+        android:paddingEnd="24dp"
+        android:paddingStart="24dp"
+        android:text="0"
+        android:textColor="#1C1C1E"
+        android:textSize="64sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="5"
+        android:orientation="vertical"
+        android:paddingBottom="16dp"
+        android:paddingEnd="8dp"
+        android:paddingStart="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+            <com.google.android.material.button.MaterialButton android:id="@+id/btnAC"
+                style="@style/CalcBtnGray" android:layout_weight="1" android:text="AC" android:textSize="20sp"/>
+            <com.google.android.material.button.MaterialButton android:id="@+id/btnPercent"
+                style="@style/CalcBtnGray" android:layout_weight="1" android:text="%"/>
+            <com.google.android.material.button.MaterialButton android:id="@+id/btnBackspace"
+                style="@style/CalcBtnGray" android:layout_weight="1" android:text="&#x232B;"/>
+            <com.google.android.material.button.MaterialButton android:id="@+id/btnDivide"
+                style="@style/CalcBtnOp" android:layout_weight="1" android:text="&#xF7;"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+            <com.google.android.material.button.MaterialButton android:id="@+id/btn7"
+                style="@style/CalcBtn" android:layout_weight="1" android:text="7"/>
+            <com.google.android.material.button.MaterialButton android:id="@+id/btn8"
+                style="@style/CalcBtn" android:layout_weight="1" android:text="8"/>
+            <com.google.android.material.button.MaterialButton android:id="@+id/btn9"
+                style="@style/CalcBtn" android:layout_weight="1" android:text="9"/>
+            <com.google.android.material.button.MaterialButton android:id="@+id/btnMultiply"
+                style="@style/CalcBtnOp" android:layout_weight="1" android:text="&#xD7;"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+            <com.google.android.material.button.MaterialButton android:id="@+id/btn4"
+                style="@style/CalcBtn" android:layout_weight="1" android:text="4"/>
+            <com.google.android.material.button.MaterialButton android:id="@+id/btn5"
+                style="@style/CalcBtn" android:layout_weight="1" android:text="5"/>
+            <com.google.android.material.button.MaterialButton android:id="@+id/btn6"
+                style="@style/CalcBtn" android:layout_weight="1" android:text="6"/>
+            <com.google.android.material.button.MaterialButton android:id="@+id/btnMinus"
+                style="@style/CalcBtnOp" android:layout_weight="1" android:text="&#x2212;"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+            <com.google.android.material.button.MaterialButton android:id="@+id/btn1"
+                style="@style/CalcBtn" android:layout_weight="1" android:text="1"/>
+            <com.google.android.material.button.MaterialButton android:id="@+id/btn2"
+                style="@style/CalcBtn" android:layout_weight="1" android:text="2"/>
+            <com.google.android.material.button.MaterialButton android:id="@+id/btn3"
+                style="@style/CalcBtn" android:layout_weight="1" android:text="3"/>
+            <com.google.android.material.button.MaterialButton android:id="@+id/btnPlus"
+                style="@style/CalcBtnOp" android:layout_weight="1" android:text="+"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+            <com.google.android.material.button.MaterialButton android:id="@+id/btn00"
+                style="@style/CalcBtn" android:layout_weight="1" android:text="00"/>
+            <com.google.android.material.button.MaterialButton android:id="@+id/btn0"
+                style="@style/CalcBtn" android:layout_weight="1" android:text="0"/>
+            <com.google.android.material.button.MaterialButton android:id="@+id/btnDot"
+                style="@style/CalcBtn" android:layout_weight="1" android:text="."/>
+            <com.google.android.material.button.MaterialButton android:id="@+id/btnEquals"
+                style="@style/CalcBtnEq" android:layout_weight="1" android:text="="/>
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>
