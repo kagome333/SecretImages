@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">シークレット画像</string>
+    <string name="app_name">電卓</string>
+    <string name="empty_gallery">写真がありません
+&#x30B6;&#x30AB;&#x140E;&#x1E3B;&#x18F7;&#x140D;&#x30F3;&#x30A0;&#x140D;&#x3049;&#x3067;&#x191AE;&#x5F71;&#x3067;&#x304D;&#x1404;&#x3056;&#x3033;&#x3055;&#x30AA;</string>
+    <string name="empty_folder">写真がありません
+&#x30AB;&#x140E;&#x18F7;&#x1E3B;&#x12DF;&#x140C;&#x309F;&#x3053;&#x1409;&#x64D2;&#x5F97;&#x140C;&#x3056;&#x3033;&#x3055;&#x30AA;</string>
 </resources>
