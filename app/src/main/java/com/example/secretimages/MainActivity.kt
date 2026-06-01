@@ -25,16 +25,16 @@ import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private lateinit var adapter: GalleryAdapter
+    private lateinit var adapter: PhotoGridAdapter
     private var currentPhotoFile: File? = null
 
     private val secretDir: File
         get() = File(filesDir, "secret_photos").also { it.mkdirs() }
 
-    private val cameraPermLauncher = registerForActivityResult(
+    private val cameraPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
-        if (granted) launchCamera(secretDir)
+        if (granted) launchCamera()
         else Toast.makeText(this, "カメラの権限が必要です", Toast.LENGTH_SHORT).show()
     }
 
@@ -45,10 +45,14 @@ class MainActivity : AppCompatActivity() {
             currentPhotoFile?.let {
                 if (it.exists() && it.length() > 0) {
                     Toast.makeText(this, "写真を保存しました", Toast.LENGTH_SHORT).show()
-                    loadGallery()
-                } else it.delete()
+                    loadPhotos()
+                } else {
+                    it.delete()
+                }
             }
-        } else currentPhotoFile?.delete()
+        } else {
+            currentPhotoFile?.delete()
+        }
         currentPhotoFile = null
     }
 
@@ -57,92 +61,49 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
-        title = "シークレット画像"
 
-        adapter = GalleryAdapter(this,
-            onFolderClick = { folder ->
-                startActivity(Intent(this, FolderActivity::class.java).apply {
-                    putExtra("folder_path", folder.absolutePath)
-                    putExtra("folder_name", folder.name)
-                })
-            },
-            onPhotoClick = { file -> showPhotoOptions(file) }
-        )
-
-        val lm = GridLayoutManager(this, 3)
-        lm.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-            override fun getSpanSize(position: Int) =
-                if (adapter.isFolder(position)) 3 else 1
-        }
-        binding.recyclerView.layoutManager = lm
+        adapter = PhotoGridAdapter(this) { file -> showPhotoOptions(file) }
+        binding.recyclerView.layoutManager = GridLayoutManager(this, 3)
         binding.recyclerView.adapter = adapter
 
-        binding.fabCamera.setOnClickListener { showFabMenu() }
-        loadGallery()
+        binding.fabCamera.setOnClickListener { checkCameraPermission() }
+        loadPhotos()
     }
 
-    override fun onResume() {
-        super.onResume()
-        loadGallery()
-    }
-
-    private fun showFabMenu() {
-        AlertDialog.Builder(this)
-            .setItems(arrayOf("写真を撮影", "フォルダを作成")) { _, i ->
-                when (i) {
-                    0 -> checkCameraAndShoot(secretDir)
-                    1 -> showCreateFolderDialog()
-                }
-            }.show()
-    }
-
-    private fun showCreateFolderDialog() {
-        val et = EditText(this).apply {
-            hint = "フォルダ名"
-            setPadding(48, 24, 48, 24)
+    private fun checkCameraPermission() {
+        when {
+            ContextCompat.checkSelfPermission(
+                this, Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED -> launchCamera()
+            else -> cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
         }
-        AlertDialog.Builder(this)
-            .setTitle("フォルダを作成")
-            .setView(et)
-            .setPositiveButton("作成") { _, _ ->
-                val name = et.text.toString().trim()
-                if (name.isNotEmpty()) {
-                    val f = File(secretDir, name)
-                    if (!f.exists()) { f.mkdirs(); loadGallery() }
-                    else Toast.makeText(this, "同じ名前のフォルダがあります", Toast.LENGTH_SHORT).show()
-                }
-            }
-            .setNegativeButton("キャンセル", null)
-            .show()
     }
 
-    private fun checkCameraAndShoot(saveDir: File) {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)
-            launchCamera(saveDir)
-        else cameraPermLauncher.launch(Manifest.permission.CAMERA)
-    }
+    private fun launchCamera() {
+        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val photoFile = File(secretDir, "IMG_${timestamp}.jpg")
+        currentPhotoFile = photoFile
 
-    private fun launchCamera(saveDir: File) {
-        val ts = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val file = File(saveDir, "IMG_$ts.jpg")
-        currentPhotoFile = file
-        val uri = FileProvider.getUriForFile(this, "${packageName}.fileprovider", file)
+        val uri: Uri = FileProvider.getUriForFile(
+            this, "${packageName}.fileprovider", photoFile
+        )
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
             putExtra(MediaStore.EXTRA_OUTPUT, uri)
         }
-        if (intent.resolveActivity(packageManager) != null) takePictureLauncher.launch(intent)
-        else Toast.makeText(this, "カメラアプリが見つかりません", Toast.LENGTH_SHORT).show()
+        if (intent.resolveActivity(packageManager) != null) {
+            takePictureLauncher.launch(intent)
+        } else {
+            Toast.makeText(this, "カメラアプリが見つかりません", Toast.LENGTH_SHORT).show()
+        }
     }
 
-    private fun loadGallery() {
-        val items = mutableListOf<GalleryItem>()
-        secretDir.listFiles()?.filter { it.isDirectory }?.sortedBy { it.name }
-            ?.forEach { items.add(GalleryItem.Folder(it)) }
-        secretDir.listFiles()?.filter { it.isFile && it.extension.lowercase() in listOf("jpg","jpeg","png") }
+    private fun loadPhotos() {
+        val photos = secretDir.listFiles()
+            ?.filter { it.extension.lowercase() in listOf("jpg", "jpeg", "png") }
             ?.sortedByDescending { it.lastModified() }
-            ?.forEach { items.add(GalleryItem.Photo(it)) }
-        adapter.submitList(items)
-        binding.tvEmpty.visibility = if (items.isEmpty()) View.VISIBLE else View.GONE
+            ?: emptyList()
+        adapter.submitList(photos)
+        binding.tvEmpty.visibility = if (photos.isEmpty()) View.VISIBLE else View.GONE
     }
 
     private fun showPhotoOptions(file: File) {
@@ -150,14 +111,49 @@ class MainActivity : AppCompatActivity() {
             .setTitle("写真の操作")
             .setItems(arrayOf("削除")) { _, _ ->
                 AlertDialog.Builder(this)
-                    .setTitle("削除確認").setMessage("この写真を削除しますお？")
+                    .setTitle("削除確認")
+                    .setMessage("この写真を削除しますか？")
                     .setPositiveButton("削除") { _, _ ->
-                        file.delete(); loadGallery()
+                        file.delete()
+                        loadPhotos()
                         Toast.makeText(this, "削除しました", Toast.LENGTH_SHORT).show()
                     }
-                    .setNegativeButton("キャンセル", null).show()
+                    .setNegativeButton("キャンセル", null)
+                    .show()
             }
-            .setNegativeButton("キャンセル", null).show()
+            .setNegativeButton("キャンセル", null)
+            .show()
+    }
+
+    private fun showCreateFolderDialog() {
+        val input = EditText(this).apply {
+            hint = "フォルダ名を入力"
+            setPadding(48, 24, 48, 24)
+        }
+        AlertDialog.Builder(this)
+            .setTitle("フォルダを作成")
+            .setView(input)
+            .setPositiveButton("作成") { _, _ ->
+                val name = input.text.toString().trim()
+                if (name.isEmpty()) {
+                    Toast.makeText(this, "フォルダ名を入力してください", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+                val folder = File(secretDir, name)
+                if (folder.exists()) {
+                    Toast.makeText(this, "同名のフォルダが既に存在します", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+                folder.mkdirs()
+                Toast.makeText(this, "フォルダを作成しました", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, FolderActivity::class.java).apply {
+                    putExtra("folder_path", folder.absolutePath)
+                    putExtra("folder_name", name)
+                }
+                startActivity(intent)
+            }
+            .setNegativeButton("キャンセル", null)
+            .show()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -167,6 +163,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.action_create_folder -> {
+                showCreateFolderDialog()
+                true
+            }
             R.id.action_change_password -> {
                 startActivity(Intent(this, ChangePasswordActivity::class.java))
                 true
@@ -175,6 +175,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    @Suppress("OVERRIDE_DEPRECATION")
-    override fun onBackPressed() { finishAffinity() }
+    override fun onBackPressed() {
+        finishAffinity()
+    }
 }
