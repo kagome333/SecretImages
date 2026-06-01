@@ -14,6 +14,7 @@ import java.io.File
 class GalleryAdapter(
     private val context: Context,
     private val onFolderClick: (File) -> Unit,
+    private val onFolderLongClick: (File) -> Unit = {},
     private val onPhotoClick: (File) -> Unit
 ) : ListAdapter<GalleryItem, RecyclerView.ViewHolder>(DIFF) {
 
@@ -34,8 +35,6 @@ class GalleryAdapter(
         is GalleryItem.Folder -> TYPE_FOLDER
         is GalleryItem.Photo -> TYPE_PHOTO
     }
-
-    fun isFolder(position: Int) = getItemViewType(position) == TYPE_FOLDER
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inf = LayoutInflater.from(parent.context)
@@ -66,6 +65,7 @@ class GalleryAdapter(
                 b.ivFolderThumb.setImageResource(android.R.drawable.ic_menu_gallery)
             }
             b.root.setOnClickListener { onFolderClick(dir) }
+            b.root.setOnLongClickListener { onFolderLongClick(dir); true }
         }
     }
 
