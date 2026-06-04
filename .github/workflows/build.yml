@@ -33,3 +33,42 @@ jobs:
           name: secret-images-debug
           path: app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
+
+      - name: Generate or restore keystore
+        run: |
+          if [ -n "${{ secrets.KEYSTORE_BASE64 }}" ]; then
+            echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > app/upload-keystore.jks
+            echo "STORE_PASS=${{ secrets.KEY_STORE_PASSWORD }}" >> $GITHUB_ENV
+            echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> $GITHUB_ENV
+            echo "KEY_PASS=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
+            echo "Using stored keystore from secret"
+          else
+            keytool -genkey -v -keystore app/upload-keystore.jks \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -alias upload \
+              -storepass android123 \
+              -keypass android123 \
+              -dname "CN=SecretImages, OU=Dev, O=SecretImages, L=Tokyo, ST=Tokyo, C=JP"
+            echo "STORE_PASS=android123" >> $GITHUB_ENV
+            echo "KEY_ALIAS=upload" >> $GITHUB_ENV
+            echo "KEY_PASS=android123" >> $GITHUB_ENV
+            echo "Generated new keystore"
+          fi
+
+      - name: Build Release AAB
+        run: gradle bundleRelease
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: secret-images-release-aab
+          path: app/build/outputs/bundle/release/app-release.aab
+          retention-days: 30
+
+      - name: Upload keystore (save for future use)
+        if: ${{ secrets.KEYSTORE_BASE64 == '' || secrets.KEYSTORE_BASE64 == null }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: upload-keystore
+          path: app/upload-keystore.jks
+          retention-days: 90
