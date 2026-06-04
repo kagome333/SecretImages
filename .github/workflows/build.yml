@@ -41,7 +41,6 @@ jobs:
             echo "STORE_PASS=${{ secrets.KEY_STORE_PASSWORD }}" >> $GITHUB_ENV
             echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> $GITHUB_ENV
             echo "KEY_PASS=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
-            echo "Using stored keystore from secret"
           else
             keytool -genkey -v -keystore app/upload-keystore.jks \
               -keyalg RSA -keysize 2048 -validity 10000 \
@@ -52,7 +51,6 @@ jobs:
             echo "STORE_PASS=android123" >> $GITHUB_ENV
             echo "KEY_ALIAS=upload" >> $GITHUB_ENV
             echo "KEY_PASS=android123" >> $GITHUB_ENV
-            echo "Generated new keystore"
           fi
 
       - name: Build Release AAB
@@ -65,8 +63,7 @@ jobs:
           path: app/build/outputs/bundle/release/app-release.aab
           retention-days: 30
 
-      - name: Upload keystore (save for future use)
-        if: ${{ secrets.KEYSTORE_BASE64 == '' || secrets.KEYSTORE_BASE64 == null }}
+      - name: Upload keystore
         uses: actions/upload-artifact@v4
         with:
           name: upload-keystore
