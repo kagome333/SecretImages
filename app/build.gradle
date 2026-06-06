@@ -9,10 +9,10 @@ android {
         applicationId "com.fukiage.secretcalculator"
         minSdk 24
                 targetSdk 35
-        versionCode21
+                versionCode 2
         versionName "1.0"
     }
-    signingConfigs {
+        
         release {
             storeFile file("upload-keystore.jks")
             storePassword System.getenv("STORE_PASS") ?: "android123"
