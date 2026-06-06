@@ -9,7 +9,7 @@ android {
         applicationId "com.fukiage.secretcalculator"
         minSdk 24
                 targetSdk 35
-        versionCode 1
+        versionCode21
         versionName "1.0"
     }
     signingConfigs {
