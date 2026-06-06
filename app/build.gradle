@@ -12,7 +12,8 @@ android {
                 versionCode 2
         versionName "1.0"
     }
-                release {
+    signingConfigs {
+        release {
             storeFile file("upload-keystore.jks")
             storePassword System.getenv("STORE_PASS") ?: "android123"
             keyAlias System.getenv("KEY_ALIAS") ?: "upload"
